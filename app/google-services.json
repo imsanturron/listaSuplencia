@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "675569366141",
+    "project_id": "lista-suplencia",
+    "storage_bucket": "lista-suplencia.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675569366141:android:c917629a6877df9a7f2d14",
+        "android_client_info": {
+          "package_name": "com.example.listasuplencia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOjuz3Fkqwpvy0a7mu4gmp-25Up8FbSsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
