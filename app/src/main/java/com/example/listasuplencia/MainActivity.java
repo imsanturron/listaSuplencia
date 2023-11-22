@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         return profesoresDisponibles;
     }
 
-    public void cargaProfesores(){
+    public void cargaProfesores() {
         // Agregar algunos profesores a la lista con disponibilidad en diferentes días
         Profesor profesor1 = new Profesor("don", "2899", "lengua");
         HashSet<String> horariosProfesor1 = new HashSet<>(Arrays.asList("9:00 AM - 12:00 PM", "2:00 PM - 5:00 PM"));
@@ -167,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void calendarClicked() {
+        databaseReference = FirebaseDatabase.getInstance().getReference("Calendar");
         databaseReference.child(stringDateSelected).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -188,10 +189,13 @@ public class MainActivity extends AppCompatActivity {
         //Date date = inFormat.parse(stringDateSelected);
         //SimpleDateFormat outFormat = new SimpleDateFormat("EEEE");
         //String goal = outFormat.format(date); // devuelve bien + 4 dias (lunes->jueves)
+        databaseReference = FirebaseDatabase.getInstance().getReference("Calendar");
         databaseReference.child(stringDateSelected).setValue(editText.getText().toString()/* + goal*/);
+        databaseReference = FirebaseDatabase.getInstance().getReference("profesores");
     }
 
     public void buttonViewEvent(View view) throws ParseException {
+        databaseReference = FirebaseDatabase.getInstance().getReference("profesores");
         SimpleDateFormat inFormat = new SimpleDateFormat("yyyymmdd");
         Date date = inFormat.parse(stringDateSelected);
         SimpleDateFormat outFormat = new SimpleDateFormat("EEEE");
@@ -320,6 +324,135 @@ public class MainActivity extends AppCompatActivity {
             envio += "Error en la busqueda.";
         }
         Button botonVerDetalle = findViewById(R.id.button2);
+        String finalEnvio = envio;
+        botonVerDetalle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Crear un Intent para abrir la nueva actividad (DetalleActivity)
+                Intent intent = new Intent(MainActivity.this, Vista.class);
+
+                // Puedes pasar información a la nueva actividad usando extras en el Intent
+                intent.putExtra("informacionExtra", finalEnvio);
+
+                // Iniciar la nueva actividad
+                startActivity(intent);
+            }
+        });
+    }
+
+    public void buttonProfesSociales(View view) {
+        List<Profesor> profesoresDeAsignatura = new ArrayList<>();
+        String asignatura = "sociales";
+        String envio = "";
+
+        // Itera sobre la lista de profesores y verifica si enseñan la asignatura especificada
+        for (Profesor profesor : listaProfesores) {
+            if (profesor.getMateria().contains(asignatura)) {
+                profesoresDeAsignatura.add(profesor);
+            }
+        }
+
+        // Muestra los resultados en la consola o en tu interfaz de usuario
+        if (!profesoresDeAsignatura.isEmpty()) {
+            envio += ("Profesores de la asignatura " + asignatura + ":\n");
+            for (Profesor profesor : profesoresDeAsignatura) {
+                envio += ("Nombre: " + profesor.getNombre() + "\n");
+                envio += ("Teléfono: " + profesor.getTelefono() + "\n");
+                envio += ("Días disponibles: " + profesor.getDisponibilidad().keySet() + "\n");
+                envio += ("Horarios disponibles: " + profesor.getDisponibilidad().values() + "\n");
+                envio += ("\n----\n\n");
+            }
+        } else {
+            envio += ("No hay profesores para la asignatura " + asignatura + ".\n");
+        }
+
+        Button botonVerDetalle = findViewById(R.id.buttonSociales);
+        String finalEnvio = envio;
+        botonVerDetalle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Crear un Intent para abrir la nueva actividad (DetalleActivity)
+                Intent intent = new Intent(MainActivity.this, Vista.class);
+
+                // Puedes pasar información a la nueva actividad usando extras en el Intent
+                intent.putExtra("informacionExtra", finalEnvio);
+
+                // Iniciar la nueva actividad
+                startActivity(intent);
+            }
+        });
+    }
+
+    public void buttonProfesMatematica(View view) {
+        List<Profesor> profesoresDeAsignatura = new ArrayList<>();
+        String asignatura = "matematica";
+        String envio = "";
+
+        // Itera sobre la lista de profesores y verifica si enseñan la asignatura especificada
+        for (Profesor profesor : listaProfesores) {
+            if (profesor.getMateria().contains(asignatura)) {
+                profesoresDeAsignatura.add(profesor);
+            }
+        }
+
+        // Muestra los resultados en la consola o en tu interfaz de usuario
+        if (!profesoresDeAsignatura.isEmpty()) {
+            envio += ("Profesores de la asignatura " + asignatura + ":\n");
+            for (Profesor profesor : profesoresDeAsignatura) {
+                envio += ("Nombre: " + profesor.getNombre() + "\n");
+                envio += ("Teléfono: " + profesor.getTelefono() + "\n");
+                envio += ("Días disponibles: " + profesor.getDisponibilidad().keySet() + "\n");
+                envio += ("Horarios disponibles: " + profesor.getDisponibilidad().values() + "\n");
+                envio += ("\n----\n\n");
+            }
+        } else {
+            envio += ("No hay profesores para la asignatura " + asignatura + ".\n");
+        }
+
+        Button botonVerDetalle = findViewById(R.id.buttonMatematica);
+        String finalEnvio = envio;
+        botonVerDetalle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Crear un Intent para abrir la nueva actividad (DetalleActivity)
+                Intent intent = new Intent(MainActivity.this, Vista.class);
+
+                // Puedes pasar información a la nueva actividad usando extras en el Intent
+                intent.putExtra("informacionExtra", finalEnvio);
+
+                // Iniciar la nueva actividad
+                startActivity(intent);
+            }
+        });
+    }
+
+    public void buttonProfesNaturales(View view) {
+        List<Profesor> profesoresDeAsignatura = new ArrayList<>();
+        String asignatura = "naturales";
+        String envio = "";
+
+        // Itera sobre la lista de profesores y verifica si enseñan la asignatura especificada
+        for (Profesor profesor : listaProfesores) {
+            if (profesor.getMateria().contains(asignatura)) {
+                profesoresDeAsignatura.add(profesor);
+            }
+        }
+
+        // Muestra los resultados en la consola o en tu interfaz de usuario
+        if (!profesoresDeAsignatura.isEmpty()) {
+            envio += ("Profesores de la asignatura " + asignatura + ":\n");
+            for (Profesor profesor : profesoresDeAsignatura) {
+                envio += ("Nombre: " + profesor.getNombre() + "\n");
+                envio += ("Teléfono: " + profesor.getTelefono() + "\n");
+                envio += ("Días disponibles: " + profesor.getDisponibilidad().keySet() + "\n");
+                envio += ("Horarios disponibles: " + profesor.getDisponibilidad().values() + "\n");
+                envio += ("\n----\n\n");
+            }
+        } else {
+            envio += ("No hay profesores para la asignatura " + asignatura + ".\n");
+        }
+
+        Button botonVerDetalle = findViewById(R.id.buttonNaturales);
         String finalEnvio = envio;
         botonVerDetalle.setOnClickListener(new View.OnClickListener() {
             @Override
