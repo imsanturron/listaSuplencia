@@ -18,6 +18,13 @@ public class Profesor {
 
     protected Map<String, Set<String>> disponibilidad;
 
+    public Profesor() {
+        this.nombre = "";
+        this.telefono = "";
+        this.materia = "";
+        this.disponibilidad = new HashMap<>();
+    }
+
     public Profesor(String nombre, String telefono,String materia) {
         this.nombre = nombre;
         this.telefono = telefono;

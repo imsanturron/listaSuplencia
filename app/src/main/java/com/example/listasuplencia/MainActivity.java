@@ -3,6 +3,12 @@ package com.example.listasuplencia;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,11 +57,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        cargaProfesores();
-        HashSet<String> horariosLunes = new HashSet<>();
-        horariosLunes.add("9:00 AM - 12:00 PM");
-        horariosLunes.add("2:00 PM - 5:00 PM");
-        profesor.agregarDisponibilidad("Lunes", horariosLunes);
+        traerProfesoresFromDB();
+        ///////////////cargaProfesores();
+        ///////////////HashSet<String> horariosLunes = new HashSet<>();
+        ///////////////horariosLunes.add("9:00 AM - 12:00 PM");
+        ///////////////horariosLunes.add("2:00 PM - 5:00 PM");
+        ///////////////profesor.agregarDisponibilidad("Lunes", horariosLunes);
 
         calendarView = findViewById(R.id.calendarView);
         editText = findViewById(R.id.editText);
@@ -70,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference("Calendar");
         // Obtén una referencia a tu base de datos
         databaseReference = FirebaseDatabase.getInstance().getReference("profesores");
-        guardarProfesorEnFirebase(profesor);
+        //////////////guardarProfesorEnFirebase(profesor);
 
 ///////////////////////////
         // Agregar disponibilidad para lunes
@@ -116,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void guardarProfesorEnFirebase(Profesor profesor) {
+        databaseReference = FirebaseDatabase.getInstance().getReference("profesores");
         // Obtén una nueva clave única para el profesor
         String key = databaseReference.push().getKey();
 
@@ -143,26 +151,93 @@ public class MainActivity extends AppCompatActivity {
         return profesoresDisponibles;
     }
 
+    public void traerProfesoresFromDB() {
+        // Dentro de tu método onCreate() u otro lugar apropiado
+        databaseReference = FirebaseDatabase.getInstance().getReference("profesores");
+
+// Agregar un listener para escuchar los cambios en los datos
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Limpiar la lista actual de profesores
+                listaProfesores.clear();
+
+                // Iterar sobre los nodos hijos (cada profesor) en dataSnapshot
+                for (DataSnapshot profesorSnapshot : dataSnapshot.getChildren()) {
+                    // Obtener datos como un Map
+                    Map<String, Object> profesorData = (Map<String, Object>) profesorSnapshot.getValue();
+
+                    // Crear objeto Profesor utilizando los datos del Map
+                    Profesor profesor = construirProfesorDesdeMap(profesorData);
+
+                    // Agregar el profesor a la lista
+                    listaProfesores.add(profesor);
+                }
+
+                // Ahora, tu listaProfesores tiene todos los profesores de la base de datos
+                // Puedes realizar cualquier acción necesaria con la lista actualizada
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Manejar errores de lectura de la base de datos (opcional)
+                Log.e("FirebaseError", "Error al leer datos de la base de datos", error.toException());
+            }
+        });
+    }
+
+    // Método para construir un objeto Profesor desde un Map
+    private Profesor construirProfesorDesdeMap(Map<String, Object> profesorData) {
+        String nombre = (String) profesorData.get("nombre");
+        String telefono = (String) profesorData.get("telefono");
+        String materia = (String) profesorData.get("materia");
+
+        // Crear objeto Profesor
+        Profesor profesor = new Profesor(nombre, telefono, materia);
+
+        // Agregar disponibilidad si está presente en el Map
+        if (profesorData.containsKey("disponibilidad")) {
+            Map<String, Object> disponibilidadData = (Map<String, Object>) profesorData.get("disponibilidad");
+            construirDisponibilidadDesdeMap(profesor, disponibilidadData);
+        }
+
+        return profesor;
+    }
+
+    // Método para construir la disponibilidad de un Profesor desde un Map
+    private void construirDisponibilidadDesdeMap(Profesor profesor, Map<String, Object> disponibilidadData) {
+        for (Map.Entry<String, Object> entry : disponibilidadData.entrySet()) {
+            String dia = entry.getKey();
+            List<String> horarios = (List<String>) entry.getValue();
+            profesor.agregarDisponibilidad(dia, new HashSet<>(horarios));
+        }
+    }
+
+
     public void cargaProfesores() {
         // Agregar algunos profesores a la lista con disponibilidad en diferentes días
-        Profesor profesor1 = new Profesor("don", "2899", "lengua");
+        Profesor profesor1 = new Profesor("dolino", "289945", "lengua");
         HashSet<String> horariosProfesor1 = new HashSet<>(Arrays.asList("9:00 AM - 12:00 PM", "2:00 PM - 5:00 PM"));
         profesor1.agregarDisponibilidad("Lunes", horariosProfesor1);
+        guardarProfesorEnFirebase(profesor1);
         listaProfesores.add(profesor1);
 
-        Profesor profesor2 = new Profesor("camila", "838", "matematica");
+        Profesor profesor2 = new Profesor("camila", "838388", "matematica");
         HashSet<String> horariosProfesor2 = new HashSet<>(Arrays.asList("10:00 AM - 1:00 PM", "3:00 PM - 6:00 PM"));
         profesor2.agregarDisponibilidad("Martes", horariosProfesor2);
+        guardarProfesorEnFirebase(profesor2);
         listaProfesores.add(profesor2);
 
-        Profesor profesor3 = new Profesor("javi", "111111", "naturales");
+        Profesor profesor3 = new Profesor("javier", "1112223", "naturales");
         HashSet<String> horariosProfesor3 = new HashSet<>(Arrays.asList("9:00 AM - 12:00 PM", "2:00 PM - 5:00 PM"));
         profesor3.agregarDisponibilidad("Martes", horariosProfesor3);
+        guardarProfesorEnFirebase(profesor3);
         listaProfesores.add(profesor3);
 
-        Profesor profesor4 = new Profesor("sofia", "6767", "computacion");
+        Profesor profesor4 = new Profesor("sofia", "6767662", "matematica");
         HashSet<String> horariosProfesor4 = new HashSet<>(Arrays.asList("11:00 AM - 12:45 AM", "8:30 PM - 9:30 PM"));
         profesor4.agregarDisponibilidad("Viernes", horariosProfesor4);
+        guardarProfesorEnFirebase(profesor4);
         listaProfesores.add(profesor4);
     }
 
